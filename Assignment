@@ -1,0 +1,519 @@
+Introduction
+Welcome to the course project. This project mainly revolves around Apache Kafka and Apache Spark which are the two most widely used tools in the industry for real-time and data processing.
+
+ 
+
+The project has been designed in collaboration with the following industry experts:
+
+
+
+
+Data and Problem Statement
+Stock Data Analysis
+
+ 
+
+Predicting the stock market is, without a doubt, one of the most challenging tasks in the finance industry. It is difficult to keep track of the market as many variables play an essential role in controlling it.
+
+ 
+
+Stock data analysis is used by investors and traders to make critical decisions related to the stocks. Investors and traders study and evaluate past and current stock data and attempt to gain an edge in the market by making decisions based on the insights obtained through the analyses.
+
+ 
+
+Suppose you are working in an angel broking company. You have been provided real-time global equity data. The data contains the following information:
+
+symbol - id of the stock
+
+timestamp - time at which we are getting the data
+
+open - the price at which the particular stock opens in the time period
+
+high - highest price of the stock during the time period
+
+low - lowest price of the stock during the time period
+
+close - the price at which the particular stock closes in the time period
+
+volume - indicates the total number of transactions involving the given stock in the time period
+
+Based on the data, you need to perform some real-time analyses to generate insights that can be used to make informed decisions.
+
+ 
+
+How to get the data?
+
+ 
+
+We have hosted a centralized Kafka server for this project.  Following are the details of the centralized Kafka server- 
+
+ 
+
+Broker ID: 52.55.237.11
+Topic Name: stockData
+ 
+
+Apart from these two parameters you also need to mention a Kafka consumer group ID, this value can be anything you like, but make sure you use a unique one each time you run your program.
+
+ 
+
+In our Kafka server, we are getting real-time data for the 4 cryptocurrencies,  BTC (Bitcoin), ETH (Ethereum), LTC (Litecoin) and XRP using a JAVA API of CryptoCompare. This API fetches the data for these 4 cryptocurrencies every minute and writes it into the above mentioned Kafka topic.
+
+ 
+
+To get this real-time data into your Spark Streaming application you need to subscribe to the  Kafka topic and create a DStream. The data that you will consume from the Kafka topic will be in JSON format. One batch of the raw data consumed from the Kafka topic is shown below. You need to set your batch interval as 1 minute. 
+
+{"symbol":"BTC","timestamp":"2019-05-14 09:43:00","priceData":{"close":8063.07,"high":8063.32,"low":8048.36,"open":8052.58,"volume":-983281.62}}
+{"symbol":"ETH","timestamp":"2019-05-14 09:43:00","priceData":{"close":207.08,"high":207.09,"low":206.71,"open":206.81,"volume":-185453.06}}
+{"symbol":"LTC","timestamp":"2019-05-14 09:43:00","priceData":{"close":90.39,"high":90.39,"low":90.23,"open":90.23,"volume":-6370.7300000000005}}
+{"symbol":"XRP","timestamp":"2019-05-14 09:43:00","priceData":{"close":0.376,"high":0.3767,"low":0.3758,"open":0.3759,"volume":58695.060000000005}}
+ 
+
+Note: The volume for certain cryptocurrencies is negative, Please take the absolute value of it before doing any calculation involving it. 
+
+ 
+
+As you can see the input data is in JSON format and you need to properly parse it into Java objects. You can refer to the segment Resources-01 (in the next session) for your reference. 
+
+ 
+
+Problem Statement
+
+ 
+
+Once you subscribe to the Kafka topic you should get a stream of the data you need to apply appropriate transformations on the Dstream to perform the below-mentioned analysis. The results of the analyses should be written in an output file. These results will act as insights to make informed decisions related to the stocks.
+
+ 
+
+Let's now look into the specifics of the problem statement:
+
+Fetch data every minute relating to the following four cryptocurrencies from the Kafka topic. 
+BTC (Bitcoin)
+ETH (Ethereum)
+LTC (Litecoin)
+XRP
+Parse the data into Java objects, refer to the segment, Resouces-01 in the next session.
+1. Calculate the simple moving average closing price of the four stocks in a 5-minute sliding window for the last 10 minutes.  Closing prices are used mostly by the traders and investors as it reflects the price at which the market finally settles down. The SMA (Simple Moving Average) is a parameter used to find the average stock price over a certain period based on a set of parameters. The simple moving average is calculated by adding a stock's prices over a certain period and dividing the sum by the total number of periods. The simple moving average can be used to identify buying and selling opportunities
+
+ 
+
+2. Find the stock out of the four stocks giving maximum profit (average closing price - average opening price) in a 5-minute sliding window for the last 10 minutes. 
+
+ 
+
+3. Calculate the trading volume(total traded volume) of the four stocks every 10 minutes and decide which stock to purchase out of the four stocks. Remember to take the absolute value of the volume. Volume plays a very important role in technical analysis as it helps us to confirm trends and patterns. You can think of volumes as a means to gain insights into how other participants perceive the market. Volumes are an indicator of how many stocks are bought and sold over a given period of time. Higher the volume, more likely the stock will be bought. 
+
+ 
+
+ 
+
+Note: The entire project can be done on the local(from Eclipse). EC2 or VM is not mandatory.
+
+ 
+
+======================================================================
+
+Note: The below problem statement is optional for you, it is added as a practice problem and doesn't have any weightage for the project. 
+
+ 
+
+ [Optional]Find out the Relative Strength Index or RSI of the four stocks in a 1-minute sliding window for the last 10 minutes. RSI is considered overbought when above 70 and oversold when below 30. The formula to calculate the RSI is as follows:
+
+
+RSI
+To simplify the calculation explanation, RSI has been broken down into its basic components: RS, Average Gain and Average Loss. This RSI calculation is based on 14 periods, which is the default suggested by Wilder in his book. Losses are expressed as positive values, not negative values.
+
+ 
+
+The very first calculations for average gain and average loss are simple 14-period averages.
+
+ 
+
+First Average Gain = Sum of Gains over the past 14 periods / 14.
+First Average Loss = Sum of Losses over the past 14 periods / 14
+
+
+The second, and subsequent, calculations are based on the prior averages and the current gain loss:
+
+ 
+
+Average Gain = [(previous Average Gain) x 13 + current Gain] / 14.
+Average Loss = [(previous Average Loss) x 13 + current Loss] / 14.
+
+
+Taking the prior value plus the current value is a smoothing technique similar to that used in calculating an exponential moving average. Here, in our case, we will use 10-period averages
+
+ 
+
+References
+https://zerodha.com/
+
+https://www.investopedia.com/
+
+
+
+Resource-01: Reading JSON file in Spark
+This is segment covers the code explanation for reading a JSON file into Spark RDDs as well to Spark Dataframe. This is a very important step in your course project. We recommend you to go through this segment before you start implementing your project. The question "How is this relevant to the project?" is answered at the end of this segment.
+
+ 
+
+JSON format in brief
+JSON, or JavaScript Object Notation, is a minimal, readable format for semi-structured data. It is used primarily to transmit data between a server and a web application. Following are the different elements of a json formatted data files-
+
+ 
+
+Keys and Values
+In JSON format the data fields are represented as key-value pair.
+
+Key: Is always a string enclosed in quotation marks
+Value: A value can be a string, number, boolean expression, array, or object (JSON Object)
+Key/Value Pair: A key-value pair follows a specific syntax, with the key followed by a colon followed by the value. Key/value pairs are comma separated
+For example, a JSON key-value pair is shown below-
+
+"Lang": "English"
+In this example, "Lang": "English" is a key/value pair. The key is "Lang" and the value is "English".
+
+ 
+
+Types of JSON values
+Array: An associative array of values
+Boolean: True or false
+Number: An integer
+Object: An associative array of key/value pairs
+String: Several plain text characters which usually form a word
+Numbers, booleans and strings are the primitive types. Let's look into JSON Arrays and Objects.
+
+ 
+
+Arrays
+It is a collection of JSON values. The elements of a JSON array are comma-separated and enclosed inside square brackets.
+
+ "vowels" : [ "a", "e","i", "o", "u" ]
+ 
+
+Objects
+A JSON object is indicated by curly brackets. Everything inside of the curly brackets is a part of the object. We already learnt that the value can be an object. So that means "foo" and the corresponding object is a key/value pair.
+
+"foo" : {
+  "Lang": "English"
+  "vowels" : [ "a", "e","i", "o", "u" ]
+}
+ 
+
+The key/value pair "Lang": "English" and the array vowels are nested inside the key/value pair "foo": { ... }. Where foo represents a JSON Object. To access a particular field inside the foo object, we need to specify the full name as foo.Lang and foo.vowels.
+
+ 
+
+ Handling JSON files with Spark
+Here will see how we can load both single-line JSON and multi-line JSON String into Spark using RDDs as well as Spark SQL.
+
+ 
+
+1. Spark RDD: Single line JSON string
+For Parsing JSON objects, we will be making use of fasterxml Jackson library. Here we will only explain the code, you can read about the library here.
+
+ 
+
+Single line JSON String means all the data elements (objects) are present in one single line. For example-
+
+example1.json: This is the string which we will read in our single line JSON string reading programs.
+
+[{"id":"1","name":"Shobhit","age":"25","cars": {"car1":"Ford","car2":"BMW","car3":"Fiat"}},{"id":"2","name":"Akash","age":"22","cars": {"car1":"Nano"}},{"id":"3","name":"Rawat","age":"23","cars": {"car1":"Lamborghini","car2":"Porsche","car3":"Jeep"}}]
+ 
+
+Let’s understand the data first. The above JSON String is an array of three outer objects as shown below. Hence this JSON string is basically a single JSON element(array). 
+
+[
+	{"id":"1","name":"Shobhit","age":"25","cars": {"car1":"Ford","car2":"BMW","car3":"Fiat"}},
+	{"id":"2","name":"Akash","age":"22","cars": {"car1":"Nano"}},
+	{"id":"3","name":"Rawat","age":"23","cars":   {"car1":"Lamborghini","car2":"Porsche","car3":"Jeep"}}
+]
+ 
+
+In each of there outer objects, we have four key-value Paris, three of which (name, id, age) are the primitive type and one named 'cars' is of type object. Further, the cars object has three key-value of primitive types. (we will look into the maximum fields which appear on the JSON string).
+
+{
+  "id":"3",
+  "name":"Rawat",
+  "age":"23",
+  "cars":{
+           "car1":"Lamborghini",
+           "car2":"Porsche",
+           "car3":"Jeep"
+         }
+} 
+ 
+
+Now, for parsing the JSON String to java object the fasterxml Jackson library requires us to create the same class structure as per the above JSON string format, which we have just discussed. Hence, for the above-discussed JSON string, we will be creating two classes named Person and Cars.
+
+ 
+
+The person class will be having four fields as follows-
+
+private String name;
+private int age;
+private int id;
+private Cars cars;
+ 
+
+And the Cars class is having the following three fields-
+
+private String car1;
+private String car2;
+private String car3;
+ 
+
+In this way, we have defined a class structure similar to our JSON string.
+
+Now we will be mapping the three objects present in our JSON string to our Person class.
+
+ 
+
+The complete implementation of the two classes is present in the Eclipse project attached at the end of the segment.
+
+ 
+
+Now let’s come to the actual part of the code. Parsing the JSON String into Java Objects.
+
+ 
+
+So first we read the JSON file using the textFile() the method.
+
+JavaRDD<String> rawData = sc.textFile("/home/abhinavrawat/streamingData/example1.json");
+ 
+
+Then we initialize the ObjectMapper class.
+
+ObjectMapper mapper = new ObjectMapper();
+ 
+
+Then we need to specify the type of the object to which we will be casting our JSON String fields i.e. Person.
+
+ 
+
+Note that here we are specifying the type as List<Person> mapped objects. This is because our JSON string is an array of objects.
+
+TypeReference<List<Person>> mapType = new TypeReference<List<Person>>() {}; 
+ 
+
+Once these parameters are initialized, we parse the JSON string. Here 'x' is the JSON string and mapType is the TypeReference declared above. Now for our input JSON string(array of JSON objects) the mapper.readValue()  method will return a List of three Person objects having the values same as it is specified in the JSON string.
+
+List<Person> personList = mapper.readValue(x, mapType);
+ 
+
+personList contains the three object parsed from the JSON file. Now we can simply return the results according to the applied transformation.
+In this example, we are creating a Pair RDD< ID, Person object> hence we are returning an iterator of Tuple2<Integer, Person> objects.
+
+ 
+
+(sparkRDD.Driver - See the code attached below in the zip file)
+
+ 
+
+Please Note: the following file format is still a single line JSON string. (example2.json)
+
+{"id":"1","name":"Shobhit","age":"25","cars": {"car1":"Ford","car2":"BMW","car3":"Fiat"}}
+{"id":"2","name":"Akash","age":"22","cars": {"car1":"Nano"}}
+{"id":"3","name":"Rawat","age":"23","cars": {"car1":"Lamborghini","car2":"Porsche","car3":"Jeep"}}
+
+Here we have one single object in a single line, hence we will be able to parse it. For it, the parsing code will be as follows. 
+
+ObjectMapper mapper = new ObjectMapper();
+TypeReference<Person> mapType = new TypeReference<Person>() {};
+Person person = mapper.readValue(x, mapType);
+ 
+
+Note, here in the TypeReference object we are just specifying the type as Person, because we don't have an array of JSON object anymore, in this file(example2.json) one single JSON object is present in one single line.
+
+(sparkRDD.Driver2 - See the code attached below in the zip file)
+
+ 
+
+2. Spark RDD: multi-line JSON string
+The multiline version of the above-mentioned JSON string is shown below (there is a change in the formatting only).
+
+ 
+
+Note: Multiple line JSON means a single JSON entity(i.e. object, array, key-value pair) is divided into multiple lines. 
+
+ 
+
+example3.json: This is the string which we will read in our multi-line JSON string reading programs.
+
+[
+	{
+		"id":"1",
+		"name":"Shobhit",
+		"age":"25",
+		"cars": {
+			"car1":"Ford",
+			"car2":"BMW",
+			"car3":"Fiat"
+		}
+	},
+	{
+		"id":"2",
+		"name":"Akash",
+		"age":"22",
+		"cars": {
+			"car1":"Nano"
+		}
+	},
+	{
+		"id":"3",
+		"name":"Rawat",
+		"age":"23",
+		"cars": {
+			"car1":"Lamborghini",
+			"car2":"Porsche",
+			"car3":"Jeep"
+		}
+	}
+]
+ 
+
+In the code, the only change will be that instead of reading the file using textFile() method we will make use of the wholeTextFiles() method.
+
+JavaPairRDD<String,String> rawData = sc.wholeTextFiles("/home/abhinavrawat/streamingData/example2.json");
+ 
+
+The textFile() method reads a file line by line(delimited by ‘\n’), whereas the wholeTextFiles(), reads the entire files together without delimiting the contents by ‘\n’.
+
+ 
+
+Now, for parsing JSON string to Java objects we need to pass the complete JSON string together to the mapper.read() method, hence in the case of a multiline JSON string, we make use of wholeTextFiles () method.
+
+ 
+
+Also, wholeTextFiles() returns a Pair RDD where the key is the name of the file and the value is the content of that file.
+
+ 
+
+3. SparkSQL: Single line JSON string
+Spark SQL provides inbuilt methods to read the json into a dataframe.  Following is the code Snippet used to read the single line JSON string into a dataset.
+
+ 
+
+We will be reading the example1.json file which is shown under "1 Spark RDD: Single line JSON String".
+
+ 
+
+Dataset<Row> rawData1 = session.read().format("json").load("/home/abhinavrawat/streamingData/example1.json"); 
+ 
+
+In this case, Spark will by default refers to the JSON schema and provides dataset as shown below. We don’t have to mention the column names.
+
+ 
+
++---+-------------------+---+-------+
+|age|cars               |id |name   |
++---+-------------------+---+-------+
+|80 |[Ford, BMW, Fiat]  |1  |Shobhit|
+|22 |[Alto, Omni, Mazda]|2  |Akash  |
+|23 |[Audi1,,]          |3  |Rawat  |
++---+-------------------+---+-------+
+ 
+
+Here, column 'cars' is a nested column and you can access the content by specifying the fields name as cars.car1, cars.car2 and cars.car3.
+ 
+
+(sparkSQL.Driver1 - See the code attached below in the zip file)
+
+4. SparkSQL: Multi-line JSON string
+In this case, we need to specify that the file contains a multiline JSON string. This is done by setting the multiLine as true using an option() method.
+
+ 
+
+We will read the example3.json file which is shown under "2 Spark RDD: multi-line JSON String".
+
+Dataset<Row> rawData2 = session.read().format("json").option("multiLine","true").load("/home/abhinavrawat/streamingData/example3.json");
+(sparkSQL.Driver1 - See the code attached below in the zip file)  
+
+https://cdn.upgrad.com/UpGrad/temp/5cd6cea4-99ab-4dd4-8f22-08806933fdf3/sparkJSONExample.zip
+
+ 
+
+The output is similar as in the above example.
+
+ 
+
+All the code files as well the data files are present inside the zip file attached below. This zip file is an Eclipse project hence you can directly import it on your Eclipse workspace and see the complete flow of the codes.
+
+Eclipse Projectfile_download	Download
+
+
+Resource-02: Guidelines to solve the project
+Follow the below guide for the Maven project setup for the project. 
+
+Eclipse-Maven Project Guidefile_download	Download 
+
+
+https://cdn.upgrad.com/UpGrad/temp/cb5f35fa-3715-4b16-911f-9fd31788fe7e/C4_Eclipse-Maven+Project+for+Course+Project%5BSpark%5D.pdf
+ 
+
+Fat jar file
+Fat jar file contains all the required jar file(based on the pom.xml file). For Spark, the fat jar is usually created to run the Spark application in the local mode. Keep the following point in your mind regarding the fat jar files- 
+
+You won’t be able to access any HDFS or S3 paths, hence you need to make use of the local directories i.e. /home/ec2-user/ for reading / writing data.
+
+Make sure to mention the main class name in the manifest tag of the pom file(Step-06 of the above document).
+
+Make sure to use the local master URL for your Spark application.
+
+>>> For running on Eclipse, or For creating fat jar to run in - local mode
+SparkConf conf = new SparkConf().setAppName("my_spark_App").setMaster("local[*]");
+ 
+
+Lean jar file
+Only contains the compiled version for you code i.e the .class file out of your Spark Application. Hence it is much smaller in size. The lean jar doesn't contain the required jar files in it, rather it only has all the information regarding them. Your EC2 instance already has all these commonly used jar files in the Spark Classpath. Hence when we submitted the lean jar using the spark2-submit command, Spark knows where to look for the required jars.  This is why for deploying a Spark application in YARN mode, we recommend you to use lean jar file, it is smaller in size and takes less time while SCP-ing it to the EC2 instance.   
+
+ 
+
+Instructions for the saving the output
+Use the following lines of code to suppress the log message. This will ensure that output data is clear i.e. without any log messages in between. 
+SparkConf conf = new SparkConf().setAppName("Kafka_SparkStreaming").setMaster("local[*]");
+JavaStreamingContext jssc = new JavaStreamingContext(conf, Durations.minutes(1));
+jssc.sparkContext().setLogLevel("WARN");
+ 
+
+Now, re-direct your Eclipse console output to a text file, follow the steps in the document below. You will require this log file as part of the project submission. 
+Redirecting Eclipse console logs to a text filefile_download	Download
+Make sure to print-
+Every batch fetched from the Kafka server. 
+The parameters(moving average, max profit and trading volume) with proper labels in the System.out.println() statement, so that they are easy to identify in the console. 
+Creating a fat jar for submission
+In this project, you are required to submit the fat jar, which should run without any error. While creating your fat jar for submission keep the following things in mind-
+
+
+https://cdn.upgrad.com/UpGrad/temp/fdb05a95-ff30-4687-8547-b2bdd3416f5e/C4_Re-directing_Eclipse_Console_Output.pdf
+
+You need to take the following parameter as command line arguments(in the same order). Please don't hard code any of these parameters.
+Kafka Broker ID(the server IP)
+Kafka topic name
+Kafka group ID
+Make use of the following command to test your fat jar.
+java -jar <path to the fat jar> <args01> <args02>...
+
+
+
+ 
+
+ 
+
+Project walkthrough 
+Subscribe to the Kafka topic to get DStream. 
+Solve the three analysis problems. 
+We recommend you to run your code from Eclipse IDE itself(local mode).   
+Now for the output, Print the corresponding data and the results on the console. For the submission- 
+Manually copy paste the console output to a file, OR-
+Redirect the console output to a file using the above-mentioned steps.
+Once you are satisfied with your results create a fat jar(for the submission) with the instruction mentioned above.
+ 
+
+ 
+How is this relevant to the project?
+In this segment, we have covered reading JSON string from the Spark batch jobs perspective. And as your project is a streaming project, following are some points which will help you relate the material present here with our course project.
+
+The data which you will get from Kafka will similar to the format as shown in the example2.json. You can verify it by printing the Kafka stream. 
+Hence, the logic present in the sparkRDD.Driver2 code(inside the eclipse project) can be applied here to parse the stock price single-line JSON objects into compatible Java objects.
+Whatever classes you use to parse your input, provide them as a part of your solution.
